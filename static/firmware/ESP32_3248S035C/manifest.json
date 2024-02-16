@@ -1,0 +1,28 @@
+{
+    "name": "BitcoinTaps PartyTap",
+    "version": "827652",
+    "new_install_prompt_erase": true,
+    "builds": [
+        {
+            "chipFamily": "ESP32",
+            "parts": [
+                {
+                    "path": "/partytap/static/firmware/ESP32_3248S035C/bootloader.bin",
+                    "offset": 4096
+                },
+                {
+                    "path": "/partytap/static/firmware/ESP32_3248S035C/partitions.bin",
+                    "offset": 32768
+                },
+                {
+                    "path": "/partytap/static/firmware/ESP32_3248S035C/boot_app0.bin",
+                    "offset": 57344
+                },
+                {
+                    "path": "/partytap/static/firmware/ESP32_3248S035C/firmware.bin",
+                    "offset": 65536
+                }
+            ]
+        }
+    ]
+}
