@@ -1,6 +1,6 @@
 {
     "name": "BitcoinTaps PartyTap",
-    "version": "830902",
+    "version": "830907",
     "new_install_prompt_erase": true,
     "builds": [
         {
