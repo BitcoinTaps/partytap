@@ -151,8 +151,11 @@ async def task_send_switches(device_id: str):
             "currency": device.currency
         })
 
-    await websocketUpdater(device_id,json.dumps(message))
-    
+    try:
+        await websocketUpdater(device_id,json.dumps(message))
+    except:
+        logger.error("Exception in websocket updater")
+
 async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
     logger.info("task_make_lnurlw")
 
