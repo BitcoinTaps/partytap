@@ -183,7 +183,7 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
     logger.info(json.dumps(result))
 
     if 'status' in result and result['status'] == "ERROR":
-        logger.error("Error in LNURLW response")
+        logger.error("Error when trying to make payment")
         if 'reason' in result:
             logger.error(f"Reason: {result['reason']}")
 
@@ -214,12 +214,32 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
     
     # construct callback url
     url = f"{result['callback']}?k1={result['k1']}&pr={payment_request}"
+    logger.info(f"callback URL: {url}")
     
     # just make the call and forget about it 
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(url)
             result = response.json()
+            logger.info(f"Payment response {result}")
+
+            if 'status' in result and result['status'] == "ERROR":
+                logger.error("Error in LNURLW response")
+                if 'reason' in result:
+                    logger.error(f"Reason: {result['reason']}")
+
+                    
+                await websocketUpdater(
+                    device_id,
+                    json.dumps({
+                        "event":"paymentfailed",
+                        "pr": payment_request
+                    })
+                )
+
+                return
+
+            
         except (httpx.ConnectError, httpx.RequestError):
             logger.error("http request failed")
 
