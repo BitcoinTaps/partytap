@@ -46,22 +46,32 @@ import json
 
 @partytap_ext.websocket("/api/v1/ws/{item_id}")
 async def websocket_connect(websocket: WebSocket, item_id: str):
-    device = await get_device(item_id)
-    if not device:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="device does not exist"
-        )
-    await websocketManager.connect(websocket, item_id)
     try:
-        await task_send_switches(item_id)
+        await websocketManager.connect(websocket, item_id)
+
+        device = await get_device(item_id)            
+        if device:
+            await task_send_switches(item_id)            
+        else:
+            logger.info("Incorrect deviceid")
+            await websocketUpdater(item_id,'{"event":"error","message":"device id does not exist"}')
+                    
         while True:
             message = await websocket.receive_text()
             logger.info(f"Received message from websocket: {message}")
+
+            if not device:
+                logger.info(f"Ignoring websocket message")
+                continue
+
             try:
                 jsobj = json.loads(message)
             except json.decoder.JSONDecodeError:
                 logger.warning("Invalid JSON message received. Ignoring")                                        
                 continue
+
+            
+            
 
             if not "event" in jsobj:
                 logger.warning("No event in message, ignored") 
@@ -96,6 +106,7 @@ async def websocket_connect(websocket: WebSocket, item_id: str):
                 logger.warning(f"Unknown event type {jsobj['event']} ignored")
 
     except WebSocketDisconnect:
+        logger.warning(f"WebSocket disconnected")
         websocketManager.disconnect(websocket)
 
 
