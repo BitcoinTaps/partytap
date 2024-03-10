@@ -105,8 +105,8 @@ async def websocket_connect(websocket: WebSocket, item_id: str):
             else:                
                 logger.warning(f"Unknown event type {jsobj['event']} ignored")
 
-    except WebSocketDisconnect:
-        logger.warning(f"WebSocket disconnected")
+    except WebSocketDisconnect as err:
+        logger.warning(f"WebSocket disconnected: code {err.code}, reason {err.reason}")
         websocketManager.disconnect(websocket)
 
 
