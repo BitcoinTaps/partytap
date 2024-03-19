@@ -1,11 +1,10 @@
 import json
 from sqlite3 import Row
 from typing import List, Optional
+from enum import Enum
 
 from lnurl.types import LnurlPayMetadata
 from pydantic import BaseModel, Json
-
-
 class LnurldeviceSwitch(BaseModel):
     id: Optional[str]
     amount: float = 0.0
@@ -40,6 +39,7 @@ class LnurldevicePayment(BaseModel):
     payhash: str
     payload: str
     switchid: str
+    pin: str
     sats: int
     timestamp: str
 

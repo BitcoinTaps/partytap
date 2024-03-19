@@ -121,6 +121,7 @@ async def create_payment(
     payload: Optional[str] = None,
     payhash: Optional[str] = None,
     sats: Optional[int] = 0,
+    pin: Optional[str] = ""
 ) -> LnurldevicePayment:
 
 
@@ -133,14 +134,15 @@ async def create_payment(
             switchid,
             payload,
             payhash,
-            sats
+            sats,
+            pin
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
-        (payment_id, device_id, switch_id, payload, payhash, sats),
+        (payment_id, device_id, switch_id, payload, payhash, sats, pin),
     )
     payment = await get_payment(payment_id)
-    assert payment, "Couldnt retrieve newly created payment"
+    assert payment, "Could not retrieve newly created payment"
     return payment
 
 
@@ -160,10 +162,12 @@ async def update_payment(
 async def get_payment(
     lnurldevicepayment_id: str,
 ) -> Optional[LnurldevicePayment]:
+    logger.info(f"get_payment {lnurldevicepayment_id}")
     row = await db.fetchone(
         "SELECT * FROM partytap.payment WHERE id = ?",
         (lnurldevicepayment_id,),
     )
+    logger.info(row)
     return LnurldevicePayment(**row) if row else None
 
 async def get_payment_by_p(
