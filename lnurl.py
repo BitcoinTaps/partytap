@@ -22,6 +22,7 @@ from .crud import (
     create_payment_memo,
     create_payment_metadata
 )
+from loguru import logger
 
 @partytap_ext.get(
     "/api/v1/lnurl/{device_id}",
@@ -113,6 +114,8 @@ async def lnurl_callback(
             status_code=HTTPStatus.NOT_FOUND, detail="payment not found."
         )
     
+    logger.info(f"payment pin: {payment.pin}")
+
     if payment.payhash == 'used':
         return {"status": "ERROR", "reason": "Payment already used."}
 
@@ -156,9 +159,21 @@ async def lnurl_callback(
         payment_id=paymentid, payhash=payment_hash
     )
 
-    return {
-        "pr": payment_request,
-        "routes": [],
-    }
+    if ( payment.pin is not None and len(payment.pin) > 0 ):
+        logger.info("Returning success action")
+        return {
+            "pr": payment_request,
+            "successAction": {
+                "tag": "url",
+                "description": "Check the attached link",
+                "url": str(request.url_for("partytap.displaypin", paymentid=paymentid)),
+            },
+            "routes": [],
+        }        
+    else:
+        return {
+            "pr": payment_request,
+            "routes": [],
+        }
 
    

@@ -37,7 +37,8 @@ from .crud import (
 from .tasks import (
     task_create_invoice,
     task_send_switches,
-    task_make_lnurlw
+    task_make_lnurlw,
+    task_create_offline_payment
     
 )
 from .models import CreateLnurldevice
@@ -130,6 +131,11 @@ async def api_device_update(
     await task_send_switches(device_id)
     return device
 
+
+@partytap_ext.get("/api/v1/device/{device_id}/payment")
+async def api_lnurldevice_offline_payment(req: Request, device_id: str, encrypted: str, iv: str):
+    return await task_create_offline_payment(req, device_id, encrypted, iv)
+
 @partytap_ext.get("/api/v1/device")
 async def api_lnurldevices_retrieve(
     req: Request, wallet: WalletTypeInfo = Depends(get_key_type)
@@ -173,7 +179,8 @@ async def api_lnurldevice_switches(req: Request, lnurldevice_id: str):
         )
 
     connectdevice = {
-        "switches": lnurldevice.switches
+        "switches": lnurldevice.switches,
+        "key":lnurldevice.key
     }
 
     return connectdevice

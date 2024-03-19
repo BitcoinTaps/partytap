@@ -35,4 +35,8 @@ async def m001_initial(db):
     """
     )
 
+async def m002_redux(db):
+     await db.execute(
+        "ALTER TABLE partytap.payment ADD COLUMN pin TEXT DEFAULT '';"
+    )
 

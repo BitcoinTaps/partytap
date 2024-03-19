@@ -8,6 +8,12 @@ from lnbits.core.crud import get_user, update_payment_extra
 from lnbits.utils.exchange_rates import fiat_amount_as_satoshis
 from lnbits.core.services import create_invoice
 import httpx
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+from hashlib import sha256
+from fastapi import HTTPException, Query, Request
+from http import HTTPStatus
+
 
 from .crud import (
     get_payment, 
@@ -17,6 +23,7 @@ from .crud import (
     create_payment_memo,
     create_payment_metadata
 )
+
 
 from loguru import logger
 import json
@@ -42,10 +49,6 @@ async def on_invoice_paid(payment: Payment) -> None:
     if device_payment.payhash == "used":
         return
 
-    device_payment = await update_payment(
-        payment_id=payment.extra["id"], payhash="used"
-    )
-
     await update_payment_extra(payment_hash=payment.payment_hash, extra = { 'received':True})        
 
     message = json.dumps({
@@ -58,6 +61,72 @@ async def on_invoice_paid(payment: Payment) -> None:
         device_payment.deviceid,
         message    
     )
+
+async def task_create_offline_payment(request: Request, device_id: str, encrypted: str, iv: str):
+    # decrypt with deviceid
+    device = await get_device(device_id)
+    if not device:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="device does not exist"
+        )
+    
+    # convert IV to byte string
+    ivBytes = bytes.fromhex(iv)
+    keyBytes = str.encode(device.key[:16])
+    encryptedBytes = bytes.fromhex(encrypted)
+
+    # we're using AES CBC mode
+    cipher = Cipher(algorithms.AES(keyBytes), modes.CBC(ivBytes))
+    decryptor = cipher.decryptor()
+    decrypted_message = decryptor.update(encryptedBytes) + decryptor.finalize()
+
+    if ( decrypted_message[16:].hex() != sha256(decrypted_message[:16]).hexdigest() ):
+        logger.info(f"Incorrect message hash, message ignored")
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail="Incorrect input"
+        )
+
+    switch_id = decrypted_message[0:8].decode()
+    switch = None
+    if device.switches:
+        for _switch in device.switches:
+            if ( _switch.id == switch_id ):
+                switch = _switch
+                break
+    if not switch:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="swwitch does not exist"
+        )
+
+    # extract PIN    
+    secret_pin = decrypted_message[9:15].decode()
+
+    # determine price
+    price_msat = int((
+        await fiat_amount_as_satoshis(float(switch.amount), device.currency)
+        if device.currency != "sat"
+        else float(switch.amount)
+    ) * 1000)
+
+    # create payment
+    payment = await create_payment(
+        device_id=device.id,
+        switch_id=switch.id,
+        payload=switch.duration,
+        pin=secret_pin,
+        sats=price_msat,
+        payhash="created"
+    )
+
+    return {
+        "tag": "payRequest",
+        "callback": str(request.url_for(
+            "partytap.lnurl_callback", paymentid=payment.id
+        )),
+        "minSendable": price_msat,
+        "maxSendable": price_msat,
+        "metadata": create_payment_metadata(device,switch)
+    }
 
 async def task_create_invoice(device_id: str, switch_id: str):
     logger.info(f"Create invoice for device: {device_id} and switch: {switch_id}")
@@ -138,7 +207,8 @@ async def task_send_switches(device_id: str):
     
     message = {
         "event":"switches",
-        "switches": []
+        "switches": [],
+        "key": device.key
     }
 
     for _switch in device.switches:
