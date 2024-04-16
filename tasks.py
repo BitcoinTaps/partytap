@@ -208,7 +208,8 @@ async def task_send_switches(device_id: str):
     message = {
         "event":"switches",
         "switches": [],
-        "key": device.key
+        "key": device.key,
+        "version": "839351"
     }
 
     for _switch in device.switches:
