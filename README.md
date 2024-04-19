@@ -14,4 +14,3 @@ The PartyTap supports three operating modes: online, offline and auto.
 - In online mode, the PartyTap is only available when there is an active internet connection with its LNbits server. 
 - On offline mode, the PartyTap is forced into offline mode, independent of the availabillity of an internet connection. When the PartyTap is connected, updates to product configuration are still pushed to the device, but the payment flow remains the offline variant.
 - In auto mode, the PartyTap switches between online and offline payment mode, depending on the availability of an internet connection. If no connection is available, it automatically switches to offline mode. Internet back? then online payment mode is resumed.
--  
