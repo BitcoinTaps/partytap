@@ -31,8 +31,7 @@ from .crud import (
     delete_device,
     get_device,
     get_devices,
-    update_device,
-    get_payment
+    update_device
 )
 from .tasks import (
     task_create_invoice,

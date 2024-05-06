@@ -95,11 +95,17 @@ async def task_create_offline_payment(request: Request, device_id: str, encrypte
                 break
     if not switch:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="swwitch does not exist"
+            status_code=HTTPStatus.NOT_FOUND, detail="switch does not exist"
         )
 
     # extract PIN    
-    secret_pin = decrypted_message[9:15].decode()
+    decrypted_pin_part = decrypted_message[9:16].decode()
+    result = decrypted_pin_part.find(':')
+    if result == -1:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Incorrect payload"
+        )
+    secret_pin = decrypted_pin_part[:result]
 
     # determine price
     price_msat = int((
@@ -209,7 +215,7 @@ async def task_send_switches(device_id: str):
         "event":"switches",
         "switches": [],
         "key": device.key,
-        "version": "839351"
+        "version": "842209"
     }
 
     for _switch in device.switches:
