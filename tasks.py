@@ -1,7 +1,7 @@
 import asyncio
 
 from lnbits.core.models import Payment
-from lnbits.core.services import websocketUpdater
+from lnbits.core.services import websocket_updater
 from lnbits.helpers import get_current_extension_name
 from lnbits.tasks import register_invoice_listener
 from lnbits.core.crud import get_user, update_payment_extra
@@ -16,7 +16,7 @@ from http import HTTPStatus
 
 
 from .crud import (
-    get_payment, 
+    get_payment,
     update_payment,
     get_device,
     create_payment,
@@ -57,7 +57,7 @@ async def on_invoice_paid(payment: Payment) -> None:
         'payload': device_payment.payload
     })
     logger.info(message)
-    return await websocketUpdater(
+    return await websocket_updater(
         device_payment.deviceid,
         message    
     )
@@ -173,7 +173,8 @@ async def task_create_invoice(device_id: str, switch_id: str):
         wallet_id=device.wallet,
         amount=int(payment.sats / 1000),
         memo=create_payment_memo(device,switch),
-        unhashed_description=create_payment_metadata(device,switch).encode(),
+        unhashed_description=create_payment_metadata(device,switch).encode(),        
+        expiry=120,
         extra={
             "tag": "PartyTap",
             "Device": device.id,
@@ -191,7 +192,7 @@ async def task_create_invoice(device_id: str, switch_id: str):
         payment_id=payment.id, payhash=payment_hash
     )
 
-    await websocketUpdater(
+    await websocket_updater(
         device_id,
         json.dumps({
             "event":"invoice",
@@ -215,7 +216,7 @@ async def task_send_switches(device_id: str):
         "event":"switches",
         "switches": [],
         "key": device.key,
-        "version": "842370"
+        "version": "846358"
     }
 
     for _switch in device.switches:
@@ -230,7 +231,7 @@ async def task_send_switches(device_id: str):
 
     logger.info("Calling websocket updater")
     try:
-        await websocketUpdater(device_id,json.dumps(message))
+        await websocket_updater(device_id,json.dumps(message))
     except Exception as err:
         logger.error("Websocket updater failed")
         logger.error(err)
@@ -271,7 +272,7 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
             logger.error(f"Reason: {result['reason']}")
 
 
-        await websocketUpdater(
+        await websocket_updater(
             device_id,
             json.dumps({
                 "event":"paymentfailed",
@@ -285,7 +286,7 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
         if not field in result:
             logger.error(f"No {field} in result")
 
-            await websocketUpdater(
+            await websocket_updater(
                 device_id,
                 json.dumps({
                     "event":"paymentfailed",
@@ -312,7 +313,7 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
                     logger.error(f"Reason: {result['reason']}")
 
                     
-                await websocketUpdater(
+                await websocket_updater(
                     device_id,
                     json.dumps({
                         "event":"paymentfailed",
@@ -326,7 +327,7 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
         except (httpx.ConnectError, httpx.RequestError):
             logger.error("http request failed")
 
-            await websocketUpdater(
+            await websocket_updater(
                 device_id,
                 json.dumps({
                     "event":"paymentfailed",

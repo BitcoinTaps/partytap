@@ -21,8 +21,8 @@ from lnbits.utils.exchange_rates import (
     currencies
 )
 from lnbits.core.services import (
-    websocketManager,
-    websocketUpdater
+    websocket_manager,
+    websocket_updater
 )
 
 from . import partytap_ext, scheduled_tasks
@@ -47,14 +47,14 @@ import json
 @partytap_ext.websocket("/api/v1/ws/{item_id}")
 async def websocket_connect(websocket: WebSocket, item_id: str):
     try:
-        await websocketManager.connect(websocket, item_id)
+        await websocket_manager.connect(websocket, item_id)
 
         device = await get_device(item_id)            
         if device:
             await task_send_switches(item_id)            
         else:
             logger.info("Incorrect deviceid")
-            await websocketUpdater(item_id,'{"event":"error","message":"device id does not exist"}')
+            await websocket_updater(item_id,'{"event":"error","message":"device id does not exist"}')
                     
         while True:
             message = await websocket.receive_text()
@@ -107,7 +107,7 @@ async def websocket_connect(websocket: WebSocket, item_id: str):
 
     except WebSocketDisconnect as err:
         logger.warning(f"WebSocket disconnected: code {err.code}, reason {err.reason}")
-        websocketManager.disconnect(websocket)
+        websocket_manager.disconnect(websocket)
 
 
 @partytap_ext.get("/api/v1/currencies")
@@ -144,7 +144,7 @@ async def api_lnurldevices_retrieve(
     devices = await get_devices(user.wallet_ids)
     for device in devices:
         device.websocket = 0
-        for connection in websocketManager.active_connections:
+        for connection in websocket_manager.active_connections:
             if connection.path_params["item_id"] == device.id:
                 device.websocket += 1
     return devices
@@ -161,7 +161,7 @@ async def api_lnurldevice_retrieve(req: Request, lnurldevice_id: str):
         )
 
     device.websocket = 0
-    for connection in websocketManager.active_connections:
+    for connection in websocket_manager.active_connections:
         if connection.path_params["item_id"] == device.id:
             device.websocket += 1
 
