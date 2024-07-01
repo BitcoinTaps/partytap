@@ -217,7 +217,7 @@ async def task_send_switches(device_id: str):
         "switches": [],
         "key": device.key,
         "version": "850212",
-        "branding": "BitcoinTaps"        
+        "branding": device.branding        
     }
 
     for _switch in device.switches:

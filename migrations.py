@@ -40,3 +40,8 @@ async def m002_redux(db):
         "ALTER TABLE partytap.payment ADD COLUMN pin TEXT DEFAULT '';"
     )
 
+async def m003_redux(db):
+     await db.execute(
+        "ALTER TABLE partytap.device ADD COLUMN branding TEXT DEFAULT 'BitcoinTaps';"
+    )
+    

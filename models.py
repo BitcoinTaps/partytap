@@ -16,6 +16,7 @@ class CreateLnurldevice(BaseModel):
     title: str
     wallet: str
     currency: str
+    branding: str
     switches: Optional[List[LnurldeviceSwitch]]
 
 
@@ -25,6 +26,7 @@ class Lnurldevice(BaseModel):
     title: str
     wallet: str
     currency: str
+    branding: str
     switches: Optional[Json[List[LnurldeviceSwitch]]]
     timestamp: str
     websocket: Optional[int]

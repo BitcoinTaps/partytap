@@ -229,6 +229,14 @@
           :options="currency"
         ></q-select>
 
+	<q-select
+          filled
+          dense
+          v-model.trim="formDialoglnurldevice.data.branding"
+          type="text"
+          label="PartyTap Branding"
+          :options="branding"
+        ></q-select>
       
         <q-btn
           class="q-mb-lg"
@@ -285,8 +293,7 @@
             v-if="formDialoglnurldevice.data.id"
             unelevated
             color="primary"
-            :disable="
-                formDialoglnurldevice.data.title == ''"
+            :disable="formDialoglnurldevice.data.title == '' || formDialoglnurldevice.data.wallet == '' || formDialoglnurldevice.data.currency == '' || formDialoglnurldevice.data.branding == '' "
             type="submit"
             >Update device</q-btn
           >
@@ -294,8 +301,7 @@
             v-else
             unelevated
             color="primary"
-            :disable="
-                formDialoglnurldevice.data.title == ''"
+            :disable="formDialoglnurldevice.data.title == '' || formDialoglnurldevice.data.wallet == '' || formDialoglnurldevice.data.currency == '' || formDialoglnurldevice.data.branding == '' "
             type="submit"
             >Create device</q-btn
           >
@@ -441,7 +447,10 @@
             show_ack: false,
             show_price: 'None',
             amount: 1,
-            title: ''
+              title: '',
+	      currency: 'EUR',
+	      branding: 'BitcoinTaps',
+	      wallet: ''
           }
         },
         qrCodeDialog: {
@@ -677,6 +686,7 @@
         '//',
         window.location.host
       ].join('')
+	this.branding = ['BitcoinTaps','None','Kan het al']
       self.wslocation = ['ws://', window.location.host].join('')
       LNbits.api
         .request('GET', '/api/v1/currencies')

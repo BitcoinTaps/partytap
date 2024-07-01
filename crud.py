@@ -29,13 +29,14 @@ async def create_device(data: CreateLnurldevice, req: Request) -> Lnurldevice:
             )
 
     await db.execute(
-        "INSERT INTO partytap.device (id, key, title, wallet, currency, switches) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO partytap.device (id, key, title, wallet, currency, branding, switches) VALUES (?, ?, ?, ?, ?, ?,?)",
         (
             device_id,
             device_key,
             data.title,
             data.wallet,
             data.currency,
+            data.branding,
             json.dumps(data.switches, default=lambda x: x.dict()),
         ),
     )
@@ -66,6 +67,7 @@ async def update_device(
             title = ?,
             wallet = ?,
             currency = ?,
+            branding = ?,
             switches = ?
         WHERE id = ?
         """,
@@ -73,6 +75,7 @@ async def update_device(
             data.title,
             data.wallet,
             data.currency,
+            data.branding,
             json.dumps(data.switches, default=lambda x: x.dict()),
             device_id,
         ),
