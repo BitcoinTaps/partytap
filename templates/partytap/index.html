@@ -215,6 +215,7 @@
           filled
           dense
           emit-value
+	  map-options
           v-model="formDialoglnurldevice.data.wallet"
           :options="g.user.walletOptions"
           label="Wallet *"
@@ -234,8 +235,12 @@
           dense
           v-model.trim="formDialoglnurldevice.data.branding"
           type="text"
-          label="PartyTap Branding"
-          :options="branding"
+          label="label"
+	  option-label="label"
+	  map-options
+          :options="[ { label: 'BitcoinTaps', value: 'BITCOINTAPS' }, { label: 'Kan het al?', value: 'BEER' }, { label: 'None', value: 'NONE' }  ]"
+	  emit-value
+	  option-value="value"
         ></q-select>
       
         <q-btn
@@ -449,7 +454,7 @@
             amount: 1,
               title: '',
 	      currency: 'EUR',
-	      branding: 'BitcoinTaps',
+	      branding: 'BITCOINTAPS',
 	      wallet: ''
           }
         },
@@ -686,7 +691,6 @@
         '//',
         window.location.host
       ].join('')
-      this.branding = [ { label: 'BitcoinTaps', value: 'BITCOINTAPS' }, { label: 'Kan het al?', value: 'BEER' }, { label: 'None', value: 'NONE' }  ]
       self.wslocation = ['ws://', window.location.host].join('')
       LNbits.api
         .request('GET', '/api/v1/currencies')
