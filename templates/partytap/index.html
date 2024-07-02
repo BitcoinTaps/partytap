@@ -686,7 +686,7 @@
         '//',
         window.location.host
       ].join('')
-	    this.branding = ['BitcoinTaps','None','Beer']
+      this.branding = [ { label: 'BitcoinTaps', value: 'BITCOINTAPS' }, { label: 'Kan het al?', value: 'BEER' }, { label: 'None', value: 'NONE' }  ]
       self.wslocation = ['ws://', window.location.host].join('')
       LNbits.api
         .request('GET', '/api/v1/currencies')
