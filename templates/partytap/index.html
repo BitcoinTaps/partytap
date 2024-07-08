@@ -133,13 +133,20 @@
 	<p>
 	  After flashing, perform the following steps:
 	  <ol>
-	    <li>Click the top bar to enter the configuration screen. The default PIN is 123456.</li>
-	    <li>Enter Wi-Fi network SSID and password.</li>
-	    <li>Enter the hostname of this LNbits server: <i>{% raw %}{{hostname}}{% endraw %}</i> </li>
-	    <li>Enter the device id of the PartyTap.</li>
-	    <li>Click 'CONNECT' and verify the the message says 'WebSocket connected'.</li>
-	    <li>Click 'TUNER' and configure the servo positions for open/close and clean. Click 'SAVE SETTINGS' to save the servo settings. The buttons 'OPEN' and 'CLOSE' can be used to test the settings.</li>
+	    <li>Click the top bar to enter the configuration screen. The default PIN is 123456. This will bring you to the Admin screen. You can always go back to this screen to inspect the current status.</li>
+      <li>On the Admin screen, press the Config button to go to the Configuration menu.</li>
+	    <li>Configure the following data:<li>
+        <ol>
+          <li>Wi-Fi network SSID and password.</li>
+	        <li>The hostname of the LNbits server: <i>{% raw %}{{hostname}}{% endraw %}</i> </li>
+	        <li>The device id of the PartyTap.</li>
+          <li>Set Payment mode to: 'Online', which is the default.</li>
+          <li>Set Control mode to: 'Servo, Time', which is the default.</li>
+          <li>Adjust the servo positions for open/close and test them using the 'Open' and 'Close' buttons.</li>      
+        </ol>
+	    <li>Press the 'Restart' button to restart the PartyTap with the updated configuration.</li>
 	  </ol>
+    The PartyTap will display a button to order a drink. If the button is not displayed, go back to the Admin page to inspect the current status.    
 	</p>
         <p>
           Created by: <A href="https://github.com/pieterjm" class="text-secondary">Pieter Meulenhoff</A>
