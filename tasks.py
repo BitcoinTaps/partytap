@@ -209,7 +209,7 @@ async def task_send_switches(device_id: str):
     try:
         device = await get_device(device_id)
     except Exception as err:
-        logger.exception("get_device triggered an exception")
+        logger.exception(err)
         return
 
     if not device:
@@ -225,7 +225,7 @@ async def task_send_switches(device_id: str):
             "branding": device.branding        
         }
     except Exception as err:
-        logger.exception("Creating message object triggered an exception")
+        logger.exception(err)
         return
 
     try:
@@ -239,7 +239,7 @@ async def task_send_switches(device_id: str):
                 "currency": device.currency
             })
     except Exception as err:
-        logger.exception("Appending switch data triggered an exception")
+        logger.exception(err)
         return
 
     logger.info("Calling websocket updater")
@@ -247,7 +247,7 @@ async def task_send_switches(device_id: str):
         await websocket_updater(device_id,json.dumps(message))
     except Exception as err:
         logger.error("Websocket updater failed")
-        logger.error(err)
+        logger.exception(err)
 
     
 async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
