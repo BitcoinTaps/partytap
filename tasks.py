@@ -206,29 +206,41 @@ async def task_create_invoice(device_id: str, switch_id: str):
 async def task_send_switches(device_id: str):
     logger.info(f"Sending switches config for device: {device_id}")
 
-    device = await get_device(device_id)
+    try:
+        device = await get_device(device_id)
+    except Exception as err:
+        logger.exception("get_device triggered an exception")
+        return
 
     if not device:
         logger.warning("No device found")
         return
     
-    message = {
-        "event":"switches",
-        "switches": [],
-        "key": device.key,
-        "version": "860004",
-        "branding": device.branding        
-    }
+    try:
+        message = {
+            "event":"switches",
+            "switches": [],
+            "key": device.key,
+            "version": "863500",
+            "branding": device.branding        
+        }
+    except Exception as err:
+        logger.exception("Creating message object triggered an exception")
+        return
 
-    for _switch in device.switches:
-        message["switches"].append({
-            "label": _switch.label,
-            "lnurl": _switch.lnurl,
-            "id":  _switch.id,
-            "duration": _switch.duration,
-            "amount": _switch.amount,
-            "currency": device.currency
-        })
+    try:
+        for _switch in device.switches:
+            message["switches"].append({
+                "label": _switch.label,
+                "lnurl": _switch.lnurl,
+                "id":  _switch.id,
+                "duration": _switch.duration,
+                "amount": _switch.amount,
+                "currency": device.currency
+            })
+    except Exception as err:
+        logger.exception("Appending switch data triggered an exception")
+        return
 
     logger.info("Calling websocket updater")
     try:
