@@ -4,8 +4,8 @@ from fastapi import Depends, HTTPException, Query, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
-from lnbits.core.crud import update_payment_status
-from lnbits.core.models import User
+from lnbits.core.crud import get_standalone_payment
+from lnbits.core.models import User, PaymentState
 from lnbits.core.views.api import api_payment
 from lnbits.decorators import check_user_exists
 
@@ -27,20 +27,24 @@ async def index(request: Request, user: User = Depends(check_user_exists)):
     "/{paymentid}", name="partytap.displaypin", response_class=HTMLResponse
 )
 async def displaypin(request: Request, paymentid: str):
-    payment = await get_payment(paymentid)
-    if not payment:
+    partytap_payment = await get_payment(paymentid)
+    if not partytap_payment:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="No payment"
         )
-    status = await api_payment(payment.payhash)
-    if status["paid"]:
-        await update_payment_status(
-            checking_id=payment.payhash, pending=True
+
+    payment = await get_standalone_payment(partytap_payment.payhash)
+    if not payment:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Payment not found."
         )
+    status = await payment.check_status()
+    if status.success:
         return partytap_renderer().TemplateResponse(
-            "partytap/paid.html", {"request": request, "pin": payment.pin}
+            "partytap/paid.html", {"request": request, "pin": partytap_payment.pin}
         )
     return partytap_renderer().TemplateResponse(
         "partytap/error.html",
         {"request": request, "pin": "filler", "not_paid": True},
     )
+    

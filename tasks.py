@@ -98,8 +98,9 @@ async def task_create_offline_payment(request: Request, device_id: str, encrypte
             status_code=HTTPStatus.NOT_FOUND, detail="switch does not exist"
         )
 
-    # extract PIN    
-    decrypted_pin_part = decrypted_message[9:16].decode()
+    # extract PIN
+    # e = 'b'Lfzmmibg:961:\x00\xfe?!\xf9\xabl
+    decrypted_pin_part = decrypted_message[9:13].decode()
     result = decrypted_pin_part.find(':')
     if result == -1:
         raise HTTPException(
@@ -221,7 +222,7 @@ async def task_send_switches(device_id: str):
             "event":"switches",
             "switches": [],
             "key": device.key,
-            "version": "863500",
+            "version": "865875",
             "branding": device.branding        
         }
     except Exception as err:
