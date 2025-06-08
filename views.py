@@ -6,7 +6,6 @@ from fastapi.responses import HTMLResponse
 
 from lnbits.core.crud import get_standalone_payment
 from lnbits.core.models import User, PaymentState
-from lnbits.core.views.api import api_payment
 from lnbits.decorators import check_user_exists
 
 from . import partytap_ext, partytap_renderer
