@@ -9,7 +9,6 @@ from fastapi import HTTPException, Query, Request
 
 from lnbits import bolt11
 from lnbits.core.services import create_invoice
-from lnbits.core.views.api import pay_invoice
 from lnbits.utils.exchange_rates import fiat_amount_as_satoshis
 
 from . import partytap_ext
