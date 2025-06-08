@@ -14,7 +14,7 @@ from lnbits.core.crud import get_user, update_payment_extra
 from lnbits.decorators import (
     WalletTypeInfo,
     check_admin,
-    get_key_type,
+    require_invoice_key,
     require_admin_key,
 )
 from lnbits.utils.exchange_rates import (
@@ -137,7 +137,7 @@ async def api_lnurldevice_offline_payment(req: Request, device_id: str, encrypte
 
 @partytap_ext.get("/api/v1/device")
 async def api_lnurldevices_retrieve(
-    req: Request, wallet: WalletTypeInfo = Depends(get_key_type)
+    req: Request, wallet: WalletTypeInfo = Depends(require_invoice_key)
 ):
     user = await get_user(wallet.wallet.user)
     assert user, "Lnurldevice cannot retrieve user"
@@ -151,7 +151,7 @@ async def api_lnurldevices_retrieve(
 
 
 @partytap_ext.get(
-    "/api/v1/device/{lnurldevice_id}", dependencies=[Depends(get_key_type)]
+    "/api/v1/device/{lnurldevice_id}", dependencies=[Depends(require_invoice_key)]
 )
 async def api_lnurldevice_retrieve(req: Request, lnurldevice_id: str):
     device = await get_device(lnurldevice_id)
