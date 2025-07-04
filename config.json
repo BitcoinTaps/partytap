@@ -1,6 +1,9 @@
 {
+    "id": "bitcointaps",
     "name": "BitcoinTaps PartyTap",
     "short_description": "Enables Bitcoin Lightning enabled (Beer)taps",    
     "tile": "/partytap/static/image/bitcointaps.png",
-    "contributors": ["pieterjm"]
+    "min_lnbits_version": "1.0.0",
+    "contributors": ["pieterjm"],
+    "license":"GPL"
 }
