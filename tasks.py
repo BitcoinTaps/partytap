@@ -311,8 +311,12 @@ async def task_make_lnurlw(device_id: str, payment_request: str,lnurlw: str):
             return
     
     # construct callback url
-    url = f"{result['callback']}?k1={result['k1']}&pr={payment_request}"
-    logger.info(f"callback URL: {url}")
+    url = result['callback']
+    if '?' not in url:
+        url += '?'
+    else:
+        url += '&'
+    url += f"k1={result['k1']}&pr={payment_request}"
     
     # just make the call and forget about it 
     async with httpx.AsyncClient() as client:
