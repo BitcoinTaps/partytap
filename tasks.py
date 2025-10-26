@@ -110,7 +110,7 @@ async def task_create_offline_payment(request: Request, device_id: str, encrypte
     # determine price
     price_msat = int((
         await fiat_amount_as_satoshis(float(switch.amount), device.currency)
-        if device.currency != "sat"
+        if device.currency.lower() != "sat"
         else float(switch.amount)
     ) * 1000)
 
@@ -154,7 +154,7 @@ async def task_create_invoice(device_id: str, switch_id: str):
     # determine price
     price_msat = int((
         await fiat_amount_as_satoshis(float(switch.amount), device.currency)
-        if device.currency != "sat"
+        if device.currency.lower() != "sat"
         else float(switch.amount)
     ) * 1000)
 

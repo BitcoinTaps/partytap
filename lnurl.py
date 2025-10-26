@@ -73,7 +73,7 @@ async def lnurl_params(
 
     price_msat = int((
         await fiat_amount_as_satoshis(float(switch.amount), device.currency)
-        if device.currency != "sat"
+        if device.currency.lower() != "sat"
         else float(switch.amount)
     ) * 1000)
 
