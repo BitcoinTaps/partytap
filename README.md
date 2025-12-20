@@ -1,3 +1,5 @@
+# THIS REPOSITORY IS DEPRECATED AND REPLACED BY THE partytap_extension
+
 # BitcoinTaps - <small>[lnbits](https://github.com/lnbits/lnbits) extension</small>
 <small>For BitcoinTaps devices</small>
 
